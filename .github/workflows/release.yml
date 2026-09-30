@@ -16,7 +16,8 @@ jobs:
         with:
           dotnet-version: "10.0.x"
       - name: Publish portable
-        run: dotnet publish src/Desktop/Defuse.Desktop.csproj -c Release -r win-x64 --self-contained true -p:AssemblyName=Defuse -p:DebugType=none -p:DebugSymbols=false -o artifacts/win-x64
+        shell: bash
+        run: dotnet publish src/Desktop/Defuse.Desktop.csproj -c Release -r win-x64 --self-contained true -p:DefuseReleaseName=true -p:Version="${GITHUB_REF_NAME#v}" -p:DebugType=none -p:DebugSymbols=false -o artifacts/win-x64
       - name: Zip portable
         run: tar -a -c -f Defuse-windows-x64-portable.zip -C artifacts/win-x64 .
       - name: Install Inno Setup
@@ -39,11 +40,11 @@ jobs:
         with:
           dotnet-version: "10.0.x"
       - name: Publish x64
-        run: dotnet publish src/App/Defuse.App.csproj -c Release -r linux-x64 --self-contained true -p:DebugType=none -p:DebugSymbols=false -o artifacts/linux-x64
+        run: dotnet publish src/App/Defuse.App.csproj -c Release -r linux-x64 --self-contained true -p:Version="${GITHUB_REF_NAME#v}" -p:DebugType=none -p:DebugSymbols=false -o artifacts/linux-x64
       - name: Pack x64
         run: tar -C artifacts/linux-x64 -czf Defuse-linux-x64.tar.gz .
       - name: Publish arm64
-        run: dotnet publish src/App/Defuse.App.csproj -c Release -r linux-arm64 --self-contained true -p:DebugType=none -p:DebugSymbols=false -o artifacts/linux-arm64
+        run: dotnet publish src/App/Defuse.App.csproj -c Release -r linux-arm64 --self-contained true -p:Version="${GITHUB_REF_NAME#v}" -p:DebugType=none -p:DebugSymbols=false -o artifacts/linux-arm64
       - name: Pack arm64
         run: tar -C artifacts/linux-arm64 -czf Defuse-linux-arm64.tar.gz .
       - name: Flatpak
@@ -73,7 +74,7 @@ jobs:
         with:
           dotnet-version: "10.0.x"
       - name: Publish
-        run: dotnet publish src/App/Defuse.App.csproj -c Release -r osx-arm64 --self-contained true -p:DebugType=none -p:DebugSymbols=false -o publish
+        run: dotnet publish src/App/Defuse.App.csproj -c Release -r osx-arm64 --self-contained true -p:Version="${GITHUB_REF_NAME#v}" -p:DebugType=none -p:DebugSymbols=false -o publish
       - name: Bundle VLC and make a disk image
         run: |
           set -euo pipefail
@@ -84,7 +85,11 @@ jobs:
           cp -R "/Volumes/vlc-src/VLC.app/Contents/MacOS/plugins/." publish/plugins/
           hdiutil detach /Volumes/vlc-src
           chmod +x publish/Defuse
-          codesign --force --deep --sign - publish
+          while IFS= read -r -d '' file; do
+            if file "$file" | grep -q 'Mach-O'; then
+              codesign --force --sign - "$file"
+            fi
+          done < <(find publish -type f -print0)
           hdiutil create -volname Defuse -srcfolder publish -ov -format UDZO Defuse-macos-arm64.dmg
       - uses: actions/upload-artifact@v4
         with:
@@ -101,7 +106,12 @@ jobs:
       - name: Install Android workload
         run: dotnet workload install android --skip-manifest-update
       - name: Publish APK
-        run: dotnet publish src/Android/Defuse.Android.csproj -c Release -f net10.0-android36.0 -p:DebugType=none -p:DebugSymbols=false -o artifacts/android
+        shell: bash
+        run: |
+          ver="${GITHUB_REF_NAME#v}"
+          IFS=. read -r major minor patch <<<"$ver"
+          code=$((10#$major * 10000 + 10#$minor * 100 + 10#$patch))
+          dotnet publish src/Android/Defuse.Android.csproj -c Release -f net10.0-android36.0 -p:Version="$ver" -p:ApplicationDisplayVersion="$ver" -p:ApplicationVersion="$code" -p:DebugType=none -p:DebugSymbols=false -o artifacts/android
       - name: Collect APK
         run: Copy-Item artifacts/android/com.defuse.player-Signed.apk Defuse-android.apk
       - uses: actions/upload-artifact@v4

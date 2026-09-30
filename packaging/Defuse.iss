@@ -32,4 +32,4 @@ Name: "{autoprograms}\Defuse"; Filename: "{app}\Defuse.exe"
 Name: "{autodesktop}\Defuse"; Filename: "{app}\Defuse.exe"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\Defuse.exe"; Description: "Launch Defuse"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\Defuse.exe"; Description: "Launch Defuse"; Flags: nowait postinstall

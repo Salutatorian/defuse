@@ -5,6 +5,7 @@ sdk: org.freedesktop.Sdk
 command: Defuse
 finish-args:
   - --share=network
+  - --talk-name=org.freedesktop.Flatpak
   - --socket=wayland
   - --socket=fallback-x11
   - --device=dri
@@ -17,7 +18,7 @@ modules:
     buildsystem: simple
     build-commands:
       - install -d /app/bin
-      - cp -a publish/. /app/bin/
+      - find . -mindepth 1 -maxdepth 1 -exec cp -a {} /app/bin/ \;
       - chmod 755 /app/bin/Defuse
     sources:
       - type: dir

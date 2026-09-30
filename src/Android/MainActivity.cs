@@ -1,4 +1,6 @@
 using Android.App;
+using Android.Content;
+using Android.Content.PM;
 using Android.Graphics;
 using Android.OS;
 using Android.Views;
@@ -47,6 +49,51 @@ public class MainActivity : Activity
         SetContentView(BuildUi());
         _session.Engine.SetVolume(_volume?.Progress ?? 80);
         Refresh();
+        _ = Task.Run(StageUpdate);
+    }
+
+    private void StageUpdate()
+    {
+        var package = ReleaseUpdate.TryStage();
+        if (package is null)
+            return;
+        RunOnUiThread(() => InstallPackage(package));
+    }
+
+    private void InstallPackage(string apkPath)
+    {
+        var installer = PackageManager?.PackageInstaller;
+        if (installer is null)
+            return;
+        PackageInstaller.Session? session = null;
+        try
+        {
+            var parameters = new PackageInstaller.SessionParams(PackageInstallMode.FullInstall);
+            parameters.SetAppPackageName("com.defuse.player");
+            var sessionId = installer.CreateSession(parameters);
+            session = installer.OpenSession(sessionId);
+            using (var input = System.IO.File.OpenRead(apkPath))
+            using (var output = session.OpenWrite("base.apk", 0, input.Length))
+            {
+                input.CopyTo(output);
+                session.Fsync(output);
+            }
+
+            var flags = PendingIntentFlags.UpdateCurrent;
+            if (OperatingSystem.IsAndroidVersionAtLeast(31))
+                flags |= PendingIntentFlags.Mutable;
+            var pending = PendingIntent.GetActivity(this, sessionId, new Intent(this, Class), flags);
+            if (pending?.IntentSender is null)
+                return;
+            session.Commit(pending.IntentSender);
+        }
+        catch (Exception ex) when (ex is Java.IO.IOException or Java.Lang.SecurityException or UnauthorizedAccessException)
+        {
+        }
+        finally
+        {
+            session?.Close();
+        }
     }
 
     protected override void OnDestroy()

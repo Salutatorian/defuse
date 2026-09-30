@@ -16,6 +16,7 @@ public partial class App : System.Windows.Application
 
     protected override void OnStartup(StartupEventArgs e)
     {
+        ReleaseUpdate.InstallOnLaunch();
         base.OnStartup(e);
         DispatcherUnhandledException += (_, args) =>
         {
