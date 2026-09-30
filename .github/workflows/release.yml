@@ -1,0 +1,129 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - name: Publish portable
+        run: dotnet publish src/Desktop/Defuse.Desktop.csproj -c Release -r win-x64 --self-contained true -p:AssemblyName=Defuse -p:DebugType=none -p:DebugSymbols=false -o artifacts/win-x64
+      - name: Zip portable
+        run: tar -a -c -f Defuse-windows-x64-portable.zip -C artifacts/win-x64 .
+      - name: Install Inno Setup
+        run: choco install innosetup --no-progress -y
+      - name: Build installer
+        run: "& '${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe' packaging\Defuse.iss"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: |
+            Defuse-windows-x64-portable.zip
+            artifacts/Defuse-windows-x64-setup.exe
+
+  linux:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - name: Publish x64
+        run: dotnet publish src/App/Defuse.App.csproj -c Release -r linux-x64 --self-contained true -p:DebugType=none -p:DebugSymbols=false -o artifacts/linux-x64
+      - name: Pack x64
+        run: tar -C artifacts/linux-x64 -czf Defuse-linux-x64.tar.gz .
+      - name: Publish arm64
+        run: dotnet publish src/App/Defuse.App.csproj -c Release -r linux-arm64 --self-contained true -p:DebugType=none -p:DebugSymbols=false -o artifacts/linux-arm64
+      - name: Pack arm64
+        run: tar -C artifacts/linux-arm64 -czf Defuse-linux-arm64.tar.gz .
+      - name: Flatpak
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y flatpak flatpak-builder
+          flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+          flatpak install --user -y flathub org.freedesktop.Platform//24.08 org.freedesktop.Sdk//24.08
+          rm -rf packaging/flatpak/publish
+          cp -a artifacts/linux-x64 packaging/flatpak/publish
+          bash packaging/linux/bundle-libvlc.sh "$PWD/packaging/flatpak/publish"
+          flatpak-builder --user --repo=repo --force-clean --disable-rofiles-fuse flatpak-build packaging/flatpak/com.defuse.Player.yml
+          flatpak build-bundle repo Defuse-linux-x64.flatpak com.defuse.Player
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux
+          path: |
+            Defuse-linux-x64.tar.gz
+            Defuse-linux-arm64.tar.gz
+            Defuse-linux-x64.flatpak
+
+  macos:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - name: Publish
+        run: dotnet publish src/App/Defuse.App.csproj -c Release -r osx-arm64 --self-contained true -p:DebugType=none -p:DebugSymbols=false -o publish
+      - name: Bundle VLC and make a disk image
+        run: |
+          set -euo pipefail
+          curl -fsSL -o vlc.dmg "https://download.videolan.org/pub/videolan/vlc/last/macosx/vlc-3.0.24-arm64.dmg"
+          hdiutil attach vlc.dmg -mountpoint /Volumes/vlc-src -nobrowse
+          mkdir -p publish/lib publish/plugins
+          cp -R "/Volumes/vlc-src/VLC.app/Contents/MacOS/lib/." publish/lib/
+          cp -R "/Volumes/vlc-src/VLC.app/Contents/MacOS/plugins/." publish/plugins/
+          hdiutil detach /Volumes/vlc-src
+          chmod +x publish/Defuse
+          codesign --force --deep --sign - publish
+          hdiutil create -volname Defuse -srcfolder publish -ov -format UDZO Defuse-macos-arm64.dmg
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos
+          path: Defuse-macos-arm64.dmg
+
+  android:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - name: Install Android workload
+        run: dotnet workload install android --skip-manifest-update
+      - name: Publish APK
+        run: dotnet publish src/Android/Defuse.Android.csproj -c Release -f net10.0-android36.0 -p:DebugType=none -p:DebugSymbols=false -o artifacts/android
+      - name: Collect APK
+        run: Copy-Item artifacts/android/com.defuse.player-Signed.apk Defuse-android.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android
+          path: Defuse-android.apk
+
+  release:
+    needs: [windows, linux, macos, android]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="${GITHUB_REF_NAME}"
+          gh release create "$tag" dist/* \
+            --repo "${GITHUB_REPOSITORY}" \
+            --title "$tag" \
+            --notes "Paste a link, save it, and play it inside Defuse. Progress stays on this device.
+
+          Linux portable builds use the VLC package installed on the computer. The Flatpak is x64 and carries VLC's libraries. Windows is an x64 portable zip and an x64 installer. The macOS disk image is Apple silicon; Gatekeeper may ask you to open it once from System Settings. The Android file is a sideload APK."

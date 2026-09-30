@@ -1,0 +1,93 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vlc="clr-namespace:LibVLCSharp.Avalonia;assembly=LibVLCSharp.Avalonia"
+        x:Class="Defuse.Cross.MainWindow"
+        Title="Defuse"
+        Width="1180" Height="820"
+        MinWidth="920" MinHeight="600"
+        Background="#171717"
+        Foreground="#EBEBEB"
+        FontFamily="Inter, Segoe UI, sans-serif"
+        KeyDown="OnWindowKey">
+  <Grid>
+    <Grid Name="HomePage" Margin="28">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="*"/>
+      </Grid.RowDefinitions>
+      <StackPanel Spacing="6">
+        <TextBlock Text="Defuse" FontSize="28" FontWeight="SemiBold"/>
+        <TextBlock Text="Paste one link per line. Saving keeps that order and plays the first title." Opacity="0.7" FontSize="13"/>
+      </StackPanel>
+      <Grid Grid.Row="1" Margin="0,18,0,0" ColumnDefinitions="*,Auto" ColumnSpacing="10">
+        <TextBox Name="AddUrl" AcceptsReturn="True" TextWrapping="NoWrap"
+                 Height="120" Watermark="https://…" KeyDown="OnAddKey"/>
+        <StackPanel Grid.Column="1" Spacing="8" VerticalAlignment="Bottom">
+          <Button Content="Save" Click="OnSave" MinWidth="96"/>
+          <Button Content="Play once" Click="OnPlayOnce" MinWidth="96"/>
+        </StackPanel>
+      </Grid>
+      <ScrollViewer Grid.Row="2" Margin="0,22,0,0">
+        <StackPanel Spacing="22">
+          <TextBlock Name="Status" Opacity="0.7" TextWrapping="Wrap"/>
+          <TextBlock Text="Continue" FontSize="16" FontWeight="SemiBold"/>
+          <ItemsControl Name="ContinueList">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+          </ItemsControl>
+          <TextBlock Text="Library" FontSize="16" FontWeight="SemiBold"/>
+          <ItemsControl Name="LibraryList">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+          </ItemsControl>
+          <TextBlock Text="Done watching" FontSize="16" FontWeight="SemiBold"/>
+          <ItemsControl Name="DoneList">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+          </ItemsControl>
+        </StackPanel>
+      </ScrollViewer>
+    </Grid>
+
+    <Grid Name="PlayerPage" IsVisible="False" Background="Black">
+      <vlc:VideoView Name="Video">
+        <Grid Name="Chrome" Background="#01000000" PointerPressed="OnPicture">
+          <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="16" Spacing="10">
+            <Button Content="Back" Click="OnLeave"/>
+            <TextBlock Name="PlayingTitle" VerticalAlignment="Center" FontSize="16"/>
+          </StackPanel>
+          <Button Name="NextButton" Content="Next" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                  Margin="0,0,24,108" Click="OnNext" IsVisible="False"/>
+          <Border HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,28"
+                  Background="#4A101010" CornerRadius="16" Padding="16,10" Width="860" MaxWidth="860">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+              <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                <Button Content="−10" Click="OnBack10" MinWidth="44"/>
+                <Button Name="PauseButton" Content="Pause" Click="OnPause" MinWidth="64"/>
+                <Button Content="+10" Click="OnForward10" MinWidth="44"/>
+                <Slider Name="Volume" Minimum="0" Maximum="100" Width="96" Value="80" VerticalAlignment="Center"/>
+              </StackPanel>
+              <Slider Name="SeekBar" Grid.Column="1" Margin="14,0" Minimum="0" Maximum="1"
+                      VerticalAlignment="Center" PointerReleased="OnSeekReleased"/>
+              <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                <TextBlock Name="Clock" VerticalAlignment="Center" FontSize="12" Opacity="0.8" Margin="0,0,6,0"/>
+                <Button Name="AudioButton" Content="Audio" Click="OnAudio"/>
+                <Button Name="SubButton" Content="Subtitles" Click="OnSubs"/>
+                <Button Name="SpeedButton" Content="1×" Click="OnSpeed"/>
+                <Button Content="Replace" Click="OnReplace"/>
+              </StackPanel>
+            </Grid>
+          </Border>
+          <Border Name="TrackMenu" IsVisible="False" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                  Margin="0,0,40,110" Background="#E6171717" CornerRadius="10" Padding="8" MaxHeight="240">
+            <ListBox Name="TrackList" Width="240" SelectionChanged="OnTrackPicked"/>
+          </Border>
+        </Grid>
+      </vlc:VideoView>
+    </Grid>
+  </Grid>
+</Window>

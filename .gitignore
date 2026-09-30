@@ -1,0 +1,15 @@
+bin/
+obj/
+.vs/
+*.user
+*.suo
+TestResults/
+artifacts/
+.idea/
+*.keystore
+*.jks
+*.pfx
+.env
+.env.*
+secret.key
+library.db

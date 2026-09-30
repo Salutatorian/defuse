@@ -1,0 +1,15 @@
+name: test
+on:
+  push:
+  pull_request:
+jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - run: dotnet test tests/Domain.Tests/Defuse.Domain.Tests.csproj --configuration Release
+      - run: dotnet test tests/Adapter.Tests/Defuse.Adapter.Tests.csproj --configuration Release
+      - run: dotnet test tests/Persistence.Tests/Defuse.Persistence.Tests.csproj --configuration Release

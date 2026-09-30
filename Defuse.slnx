@@ -1,0 +1,22 @@
+<Solution>
+  <Project Path="src/Domain/Defuse.Domain.csproj" />
+  <Project Path="src/Sources.Direct/Defuse.Sources.Direct.csproj" />
+  <Project Path="src/Sources.Library/Defuse.Sources.Library.csproj" />
+  <Project Path="src/Sources.Stremio/Defuse.Sources.Stremio.csproj" />
+  <Project Path="src/Sources.Servers/Defuse.Sources.Servers.csproj" />
+  <Project Path="src/Metadata.TMDB/Defuse.Metadata.TMDB.csproj" />
+  <Project Path="src/Integrations/Defuse.Integrations.csproj" />
+  <Project Path="src/Application/Defuse.Application.csproj" />
+  <Project Path="src/Persistence/Defuse.Persistence.csproj" />
+  <Project Path="src/Playback.LibVLC/Defuse.Playback.LibVLC.csproj" />
+  <Project Path="src/Playback.Cross/Defuse.Playback.Cross.csproj" />
+  <Project Path="src/Playback.Android/Defuse.Playback.Android.csproj" />
+  <Project Path="src/Shell/Defuse.Shell.csproj" />
+  <Project Path="src/Shell.Android/Defuse.Shell.Android.csproj" />
+  <Project Path="src/App/Defuse.App.csproj" />
+  <Project Path="src/Android/Defuse.Android.csproj" />
+  <Project Path="src/Desktop/Defuse.Desktop.csproj" />
+  <Project Path="tests/Domain.Tests/Defuse.Domain.Tests.csproj" />
+  <Project Path="tests/Adapter.Tests/Defuse.Adapter.Tests.csproj" />
+  <Project Path="tests/Persistence.Tests/Defuse.Persistence.Tests.csproj" />
+</Solution>

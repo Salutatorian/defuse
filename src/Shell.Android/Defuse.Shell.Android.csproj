@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0-android36.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Defuse.Shell</RootNamespace>
+    <AssemblyName>Defuse.Shell</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\Shell\PlayerSession.cs" Link="PlayerSession.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Application\Defuse.Application.csproj" />
+    <ProjectReference Include="..\Domain\Defuse.Domain.csproj" />
+    <ProjectReference Include="..\Persistence\Defuse.Persistence.csproj" />
+    <ProjectReference Include="..\Playback.Android\Defuse.Playback.Android.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0-android36.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Defuse.Playback.Cross</RootNamespace>
+    <AssemblyName>Defuse.Playback.Cross</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\Playback.Cross\LibVlcEngine.cs" Link="LibVlcEngine.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="LibVLCSharp" Version="3.10.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Application\Defuse.Application.csproj" />
+    <ProjectReference Include="..\Domain\Defuse.Domain.csproj" />
+  </ItemGroup>
+</Project>

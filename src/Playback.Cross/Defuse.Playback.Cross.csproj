@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Defuse.Playback.Cross</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="LibVLCSharp" Version="3.10.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Application\Defuse.Application.csproj" />
+    <ProjectReference Include="..\Domain\Defuse.Domain.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Domain\Defuse.Domain.csproj" />
+    <ProjectReference Include="..\Sources.Direct\Defuse.Sources.Direct.csproj" />
+    <ProjectReference Include="..\Sources.Library\Defuse.Sources.Library.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <BuiltInComInteropSupport Condition="$([MSBuild]::IsOSPlatform('Windows'))">true</BuiltInComInteropSupport>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <RootNamespace>Defuse.Cross</RootNamespace>
+    <AssemblyName>Defuse</AssemblyName>
+    <ApplicationIcon Condition="Exists('..\Desktop\Assets\defuse.ico')">..\Desktop\Assets\defuse.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.3.22" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.3.22" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.22" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.22" />
+    <PackageReference Include="LibVLCSharp" Version="3.10.1" />
+    <PackageReference Include="LibVLCSharp.Avalonia" Version="3.10.1" />
+    <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.24" Condition="'$(RuntimeIdentifier)' == '' Or $(RuntimeIdentifier.StartsWith('win'))" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Shell\Defuse.Shell.csproj" />
+  </ItemGroup>
+</Project>

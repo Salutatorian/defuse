@@ -1,0 +1,24 @@
+app-id: com.defuse.Player
+runtime: org.freedesktop.Platform
+runtime-version: "24.08"
+sdk: org.freedesktop.Sdk
+command: Defuse
+finish-args:
+  - --share=network
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --device=dri
+  - --socket=pulseaudio
+  - --filesystem=xdg-videos
+  - --filesystem=xdg-download
+  - --filesystem=xdg-music
+modules:
+  - name: defuse
+    buildsystem: simple
+    build-commands:
+      - install -d /app/bin
+      - cp -a publish/. /app/bin/
+      - chmod 755 /app/bin/Defuse
+    sources:
+      - type: dir
+        path: publish

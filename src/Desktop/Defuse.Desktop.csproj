@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <ApplicationIcon>Assets\defuse.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\defuse.png" />
+    <Resource Include="Assets\defuse.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="LibVLCSharp.WPF" Version="3.10.1" />
+    <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.24" />
+    <!-- Prefetch seeks in the background. On a large HTTP MKV that makes the demuxer miss the index and read forward from the start. -->
+    <VlcWindowsX64ExcludeFiles Include="plugins\stream_filter\libprefetch_plugin.dll" />
+    <VlcWindowsX86ExcludeFiles Include="plugins\stream_filter\libprefetch_plugin.dll" />
+    <VlcWindowsArm64ExcludeFiles Include="plugins\stream_filter\libprefetch_plugin.dll" />
+  </ItemGroup>
+  <Target Name="RemovePrefetchPlugin" AfterTargets="Build">
+    <Delete Files="$(OutputPath)libvlc\win-x64\plugins\stream_filter\libprefetch_plugin.dll" />
+    <Delete Files="$(OutputPath)libvlc\win-x86\plugins\stream_filter\libprefetch_plugin.dll" />
+    <Delete Files="$(OutputPath)libvlc\win-arm64\plugins\stream_filter\libprefetch_plugin.dll" />
+  </Target>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Application\Defuse.Application.csproj" />
+    <ProjectReference Include="..\Domain\Defuse.Domain.csproj" />
+    <ProjectReference Include="..\Integrations\Defuse.Integrations.csproj" />
+    <ProjectReference Include="..\Metadata.TMDB\Defuse.Metadata.TMDB.csproj" />
+    <ProjectReference Include="..\Persistence\Defuse.Persistence.csproj" />
+    <ProjectReference Include="..\Playback.LibVLC\Defuse.Playback.LibVLC.csproj" />
+    <ProjectReference Include="..\Sources.Direct\Defuse.Sources.Direct.csproj" />
+    <ProjectReference Include="..\Sources.Servers\Defuse.Sources.Servers.csproj" />
+    <ProjectReference Include="..\Sources.Stremio\Defuse.Sources.Stremio.csproj" />
+  </ItemGroup>
+
+</Project>
