@@ -4,6 +4,8 @@ Paste a link, save it, and play it inside the app. Progress stays on this device
 
 Infuse is a usability reference only: the name, graphics, layout, and branding here are not Infuse's.
 
+![Defuse home, with Continue and Library](docs/home.png)
+
 ## Download
 
 <table>
