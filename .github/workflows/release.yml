@@ -132,7 +132,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           tag="${GITHUB_REF_NAME}"
-          gh release create "$tag" dist/* \
+          mkdir -p out
+          find dist -type f -exec cp -f {} out/ \;
+          gh release create "$tag" out/* \
             --repo "${GITHUB_REPOSITORY}" \
             --title "$tag" \
             --notes "Paste a link, save it, and play it inside Defuse. Progress stays on this device.
